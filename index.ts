@@ -1,6 +1,7 @@
 import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
+import cookieParser from "cookie-parser";
 import routes from "./routes/index.route";
 import { connectDB } from "./config/database.config";
 
@@ -23,6 +24,9 @@ app.use(
 
 // Cho phép gửi dữ liệu lên dạng JSON
 app.use(express.json());
+
+// Cấu hình lấy cookie từ fe gửi lên
+app.use(cookieParser());
 
 // Thiết lập đường dẫn
 app.use("/", routes);
