@@ -8,4 +8,9 @@ router.get(
   authController.check
 );
 
+router.get(
+  "/logout",
+  authController.logout
+);
+
 export default router;
