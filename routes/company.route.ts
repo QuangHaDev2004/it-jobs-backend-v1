@@ -3,7 +3,7 @@ import * as companyController from "../controllers/company.controller";
 import * as companyValidate from "../validates/company.validate";
 import multer from "multer";
 import { storage } from "../helpers/cloudinary.helper";
-import * as authMiddleware from "../middlewares/auth.middleware"
+import * as authMiddleware from "../middlewares/auth.middleware";
 
 const router = Router();
 
@@ -35,6 +35,19 @@ router.get(
   "/job/list",
   authMiddleware.verifyTokenCompany,
   companyController.listJob
+);
+
+router.get(
+  "/job/edit/:id",
+  authMiddleware.verifyTokenCompany,
+  companyController.editJob
+);
+
+router.patch(
+  "/job/edit/:id",
+  authMiddleware.verifyTokenCompany,
+  upload.array("images", 8),
+  companyController.editJobPatch
 );
 
 export default router;
