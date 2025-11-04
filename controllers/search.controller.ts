@@ -41,6 +41,10 @@ export const search = async (req: Request, res: Response) => {
       find.title = keywordRegex;
     }
 
+    if (req.query.position) {
+      find.position = req.query.position;
+    }
+
     const jobs = await Job.find(find).sort({ createdAt: "desc" });
 
     for (const item of jobs) {
