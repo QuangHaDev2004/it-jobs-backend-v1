@@ -36,6 +36,11 @@ export const search = async (req: Request, res: Response) => {
       find.companyId = company?.id;
     }
 
+    if (req.query.keyword) {
+      const keywordRegex = new RegExp(req.query.keyword as string, "i");
+      find.title = keywordRegex;
+    }
+
     const jobs = await Job.find(find).sort({ createdAt: "desc" });
 
     for (const item of jobs) {
