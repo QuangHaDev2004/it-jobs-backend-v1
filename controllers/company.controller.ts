@@ -347,3 +347,75 @@ export const list = async (req: Request, res: Response) => {
     companyList: companyListFinal,
   });
 };
+
+export const detail = async (req: Request, res: Response) => {
+  try {
+    const id = req.params.id;
+
+    const record = await AccountCompany.findOne({
+      _id: id,
+    });
+
+    if (!record) {
+      res.json({
+        code: "error",
+        message: "Dữ liệu không hợp lệ!",
+      });
+      return;
+    }
+
+    const companyDetail = {
+      id: record.id,
+      logo: record.logo,
+      companyName: record.companyName,
+      address: record.address,
+      companyModel: record.companyModel,
+      companyEmployees: record.companyEmployees,
+      workingTime: record.workingTime,
+      workOvertime: record.workOvertime,
+      description: record.description,
+    };
+
+    // Danh sách công việc của công ty
+    const dataFinal = [];
+
+    const jobs = await Job.find({
+      companyId: record.id,
+    }).sort({
+      createdAt: "desc",
+    });
+
+    const city = await City.findOne({
+      _id: record.city,
+    });
+
+    for (const item of jobs) {
+      const itemFinal = {
+        id: item.id,
+        companyLogo: record.logo,
+        title: item.title,
+        companyName: record.companyName,
+        salaryMin: item.salaryMin,
+        salaryMax: item.salaryMax,
+        position: item.position,
+        workingForm: item.workingForm,
+        cityName: city?.name,
+        technologies: item.technologies,
+      };
+
+      dataFinal.push(itemFinal);
+    }
+
+    res.json({
+      code: "success",
+      message: "Thành công!",
+      companyDetail: companyDetail,
+      jobs: dataFinal
+    });
+  } catch (error) {
+    res.json({
+      code: "error",
+      message: "Dữ liệu không hợp lệ!",
+    });
+  }
+};
