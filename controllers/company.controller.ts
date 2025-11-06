@@ -5,6 +5,7 @@ import jwt from "jsonwebtoken";
 import { AccountRequest } from "../interfaces/request.interface";
 import Job from "../models/job.model";
 import City from "../models/city.model";
+import CV from "../models/cv.model";
 
 export const registerPost = async (req: Request, res: Response) => {
   const existAccount = await AccountCompany.findOne({
@@ -410,7 +411,62 @@ export const detail = async (req: Request, res: Response) => {
       code: "success",
       message: "Thành công!",
       companyDetail: companyDetail,
-      jobs: dataFinal
+      jobs: dataFinal,
+    });
+  } catch (error) {
+    res.json({
+      code: "error",
+      message: "Dữ liệu không hợp lệ!",
+    });
+  }
+};
+
+export const listCV = async (req: AccountRequest, res: Response) => {
+  try {
+    const companyId = req.account.id;
+
+    const jobList = await Job.find({
+      companyId: companyId,
+    });
+
+    const jobListId = jobList.map((item) => item.id);
+
+    const cvs = await CV.find({
+      jobId: { $in: jobListId },
+    }).sort({
+      createdAt: "desc",
+    });
+    
+    const dataFinal = [];
+    for (const item of cvs) {
+      const jobDetail = await Job.findOne({
+        _id: item.jobId,
+      });
+
+      if (jobDetail) {
+        const itemFinal = {
+          id: item.id,
+          jobTitle: jobDetail.title,
+          fullName: item.fullName,
+          email: item.email,
+          phone: item.phone,
+          jobSalaryMin: jobDetail.salaryMin,
+          jobSalaryMax: jobDetail.salaryMax,
+          jobPosition: jobDetail.position,
+          jobWorkingForm: jobDetail.workingForm,
+          viewed: item.viewed,
+          status: item.status,
+        };
+
+        dataFinal.push(itemFinal);
+      }
+    }
+
+    res.json({
+      code: "success",
+      message: "Thành công!",
+      cvs: dataFinal,
+      // totalPage: totalPage,
     });
   } catch (error) {
     res.json({
